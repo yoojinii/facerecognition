@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <title>로그인</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #11235A;
+            text-align: center;
+            height: 85px; /* 헤더 높이를 로고 높이와 동일하게 설정 */
+            line-height: 80px; /* 로고가 수직 중앙 정렬되도록 조정 */
+            margin-bottom: 150px;
+        }
+        header img {
+            height: 80px; /* 로고 높이를 고정 */
+            width: auto; /* 비율 유지 */
+            vertical-align: middle; /* 로고가 헤더 중앙에 위치 */
+        }
+        .container {
+            max-width: 450px;
+            margin: 30px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            margin-top: 10px;
+            font-size: 24px;
+            color: #11235A;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="submit"] {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin: 12px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #11235A;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover {
+            background-color: #0A2A7A;
+        }
+        .signup-link {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+        .signup-link a {
+            color: #11235A;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="{{ url_for('static', filename='images/fap_logo.png') }}" alt="fap 로고">
+</header>
+
+<div class="container">
+    <h2>로그인</h2>
+    <form action="/login" method="POST">
+        <input type="text" name="studentID" placeholder="아이디" required>
+        <input type="password" name="password" placeholder="비밀번호" required>
+        <input type="submit" value="로그인">
+    </form>
+    <div class="signup-link">
+        <p>아직 회원이 아니신가요? <a href="{{ url_for('register')}}">회원가입</a></p>
+    </div>
+</div>
+
+
+
+</body>
+</html>

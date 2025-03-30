@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>캘린더</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.7.0/main.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            flex-wrap: wrap;
+        }
+
+        .header-nav {
+            display: flex;
+            flex-direction: column;
+            width: 200px;
+            height: 100%;
+            position: fixed;
+            left: 0;
+            top: 0;
+            transition: width 0.3s;
+        }
+
+        header {
+            background-color: #11235A;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        header img {
+            width: 100%; /* 이미지의 너비를 조정 */
+            max-width: 220px; /* 이미지의 최대 너비 */
+            height: auto; /* 비율에 맞게 높이 자동 조정 */
+        }
+
+        nav {
+            background-color: #11235A;
+            height: calc(100vh - 50px); /* 헤더 높이를 제외한 나머지 높이 */
+            padding: 10px 0; /* 상하 패딩 추가 */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* 오른쪽 그림자 추가 */
+        }
+        nav a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            display: flex; /* 플렉스 박스를 사용하여 아이콘과 텍스트를 수평으로 정렬 */
+            align-items: center; /* 수직 중앙 정렬 */
+
+        }
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        nav img {
+            margin-right: 17px;
+            width: 40px;
+            height: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .calendar-wrapper {
+            margin-left: 160px; /* 메뉴 바 너비 */
+            padding: 20px;
+            flex: 1; /* 가변적으로 너비를 차지하도록 설정 */
+            max-width: calc(100vw - 160px); /* 메뉴 바를 제외한 최대 너비 */
+        }
+
+        #calendar {
+            margin-top: 35px;
+            width: 100%; /* 부모 컨테이너의 전체 너비 차지 */
+            height: 85vh; /* 브라우저 높이에 맞게 설정 */
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+        }
+
+        .fc-header-toolbar {
+            background-color: #080547;
+            color: white;
+            border-radius: 5px;
+            padding: 15px;
+            font-size: 1.25rem;
+        }
+
+        .fc-button {
+            background-color: #080547;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .fc-button:hover {
+            background-color: #080547;
+        }
+
+        .fc-daygrid-event {
+            background-color: #080547;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            padding: 5px 10px;
+        }
+
+        .modal-content {
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        .modal-header {
+            background-color: #080547;
+            color: white;
+            padding: 15px;
+            font-size: 1.25rem;
+        }
+        .modal-footer .btn-warning {
+            background-color: #F8F8F5;
+            border: none;
+            font-size: 1rem;
+        }
+        .modal-footer .btn-warning:hover {
+            background-color: #F8F8F5;
+        }
+        .modal-footer .btn-secondary {
+            font-size: 1rem;
+        }
+        .form-control {
+            font-size: 1.1rem;
+            padding: 10px;
+        }
+        .modal-title {
+            font-size: 1.5rem;
+        }
+        .col-form-label {
+            font-size: 1.25rem;
+        }
+
+        /* 반응형 설정 */
+        @media (max-width: 768px) {
+            .header-nav {
+                width: 100%; /* 작은 화면에서는 메뉴 바가 전체 너비 차지 */
+                height: auto; /* 높이 자동 조정 */
+                position: relative; /* 고정 위치 제거 */
+            }
+            .calendar-wrapper {
+                margin-left: 0; /* 메뉴 바 너비 없앰 */
+                padding: 10px; /* 패딩 줄임 */
+                max-width: 100%; /* 최대 너비 100% */
+            }
+            #calendar {
+                padding: 20px; /* 패딩 줄임 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+         <div class="header-nav">
+            <header>
+                <img src="{{ url_for('static', filename='images/fap_logo.png') }}" alt="FAP 로고">
+            </header>
+
+            <nav>
+                <a href="{{ url_for('account') }}">
+                    <img src="{{ url_for('static', filename='images/account.png') }}" alt="사용자 계정 아이콘">
+                    계정
+                </a>
+                <a href="{{ url_for('dashboard') }}">
+                    <img src="{{ url_for('static', filename='images/dashboard1.png') }}" alt="대시보드 아이콘">
+                    대시보드
+                </a>
+                <a href="{{ url_for('calendar') }}">
+                    <img src="{{ url_for('static', filename='images/calendar.png') }}" alt="캘린더 아이콘">
+                    캘린더
+                </a>
+                <a href="{{ url_for('message') }}">
+                    <img src="{{ url_for('static', filename='images/messenger.png') }}" alt="메신저 아이콘">
+                    메신저
+                </a>
+            </nav>
+        </div>
+
+    <div class="calendar-wrapper">
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<!-- 모달 -->
+<div class="modal fade" id="calendarModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">일정 편집</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="calendar_content">일정 내용</label>
+                    <input type="text" class="form-control" id="calendar_content">
+                    <label for="calendar_start_date">시작 날짜</label>
+                    <input type="date" class="form-control" id="calendar_start_date">
+                    <label for="calendar_end_date">종료 날짜</label>
+                    <input type="date" class="form-control" id="calendar_end_date">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveCalendar">저장</button>
+                <button type="button" class="btn btn-danger" id="deleteCalendar">삭제</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.7.0/main.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            timeZone: 'Asia/Seoul',
+            initialView: 'dayGridMonth',
+            events: '/get_events',
+            editable: true,
+            selectable: true,
+            
+            select: function(info) {
+                $('#calendar_content').val('');
+                $('#calendar_start_date').val(info.startStr);
+                $('#calendar_end_date').val(info.endStr);
+                $('#saveCalendar').data('event-id', null); // 신규 이벤트 생성
+                $('#calendarModal').modal('show');
+            },
+
+            eventClick: function(info) {
+                var event = info.event;
+                $('#calendar_content').val(event.title);
+                $('#calendar_start_date').val(event.startStr);
+                
+                // 종료 날짜를 하루 감소하여 표시
+                if (event.end) {
+                    var endDate = new Date(event.end);
+                    endDate.setDate(endDate.getDate() - 1);
+                    $('#calendar_end_date').val(endDate.toISOString().split('T')[0]);
+                } else {
+                    $('#calendar_end_date').val(event.startStr);
+                }
+
+                $('#saveCalendar').data('event-id', event.id);
+                $('#calendarModal').modal('show');
+            }
+        });
+        calendar.render();
+
+        $('#saveCalendar').on('click', function() {
+            var eventId = $(this).data('event-id');
+            var title = $('#calendar_content').val();
+            var start = $('#calendar_start_date').val();
+            var end = $('#calendar_end_date').val();
+
+            // 입력값 유효성 검사
+            if (!title || !start) {
+                alert("일정 제목과 시작 날짜를 입력하세요.");
+                return;
+            }
+
+            // 종료 날짜에 하루 더하기
+            if (end) {
+                var endDate = new Date(end);
+                endDate.setDate(endDate.getDate() + 1);
+                end = endDate.toISOString().split('T')[0];
+            }
+
+            if (eventId) {
+                // 기존 일정 업데이트
+                $.ajax({
+                    url: `/update_event/${eventId}`,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ title: title, start: start, end: end }),
+                    success: function() {
+                        var event = calendar.getEventById(eventId);
+                        event.setProp('title', title);
+                        event.setStart(start);
+                        event.setEnd(end || start);
+                        $('#calendarModal').modal('hide');
+                        alert("일정이 업데이트되었습니다.");
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error updating event:", error);
+                        alert("일정을 업데이트하는 중 문제가 발생했습니다.");
+                    }
+                });
+            } else {
+                // 새로운 일정 추가
+                $.ajax({
+                    url: '/add_event',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ title: title, start: start, end: end }),
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            calendar.addEvent({
+                                id: response.id,
+                                title: title,
+                                start: start,
+                                end: end
+                            });
+                            $('#calendarModal').modal('hide');
+                            alert("새 일정이 추가되었습니다.");
+                        } else {
+                            alert("일정을 추가하는 중 문제가 발생했습니다.");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error adding event:", error);
+                        alert("일정을 추가할 수 없습니다.");
+                    }
+                });
+            }
+        });
+
+        // 삭제 버튼 클릭 시
+        $('#deleteCalendar').on('click', function() {
+            var eventId = $('#saveCalendar').data('event-id');
+            if (eventId) {
+                $.ajax({
+                    url: `/delete_event/${eventId}`,
+                    type: 'DELETE',
+                    success: function() {
+                        var event = calendar.getEventById(eventId);
+                        event.remove();
+                        $('#calendarModal').modal('hide');
+                        alert("일정이 삭제되었습니다.");
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error deleting event:", error);
+                        alert("일정을 삭제할 수 없습니다.");
+                    }
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

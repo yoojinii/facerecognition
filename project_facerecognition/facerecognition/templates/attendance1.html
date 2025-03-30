@@ -1,0 +1,53 @@
+<!-- templates/attendance.html -->
+{% extends "base2.html" %}
+
+{% block content %}
+    <h2>출결 조회</h2>
+    
+    <!-- 출석 버튼 -->
+    <form action="/attendance" method="post">
+        <input type="hidden" name="course_id" value="{{ course_id }}">
+        <input type="hidden" name="student_id" value="{{ student_id }}">
+        <button type="submit">출석하기</button>
+    </form>
+
+    <div style="display: flex; justify-content: space-between;">
+        <!-- 캠 박스 -->
+        <div class="camera-box">
+            <h3>캠 영역</h3>
+            <img src="{{ url_for('video_feed') }}" width="100%" height="570px" alt="Camera Feed">
+            <button style="position: absolute; top: 10px; right: 10px;">출결 종료</button>
+        </div>
+
+        <!-- 출석 확인 박스 -->
+        <div class="attendance-check-box">
+            <h3>출석 확인</h3>
+            <div style="height: 570px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h4>출석 학생 리스트</h4>
+                <ul id="attendance-list" style="list-style-type: none; padding: 0; text-align: center;">
+                    <!-- 출석한 학생 이름을 동적으로 추가할 영역 -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 출석 확인 함수 (서버에서 출석 정보를 받아와서 업데이트)
+        function updateAttendanceList() {
+            fetch('/get_attendance')  // 서버에서 출석 정보를 가져오는 엔드포인트
+                .then(response => response.json())
+                .then(data => {
+                    const attendanceList = document.getElementById('attendance-list');
+                    attendanceList.innerHTML = '';  // 기존 리스트 초기화
+                    data.forEach(student => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = student;  // 학생 이름 추가
+                        attendanceList.appendChild(listItem);
+                    });
+                });
+        }
+
+        // 주기적으로 출석 리스트 업데이트
+        setInterval(updateAttendanceList, 5000);  // 5초마다 업데이트
+    </script>
+{% endblock %}

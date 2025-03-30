@@ -1,0 +1,163 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>출결 조회</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex; /* 플렉스 박스 레이아웃 사용 */
+        }
+        .header-nav {
+            display: flex; /* 헤더와 내비게이션 바를 같은 줄에 배치 */
+            flex-direction: column; /* 세로 방향으로 쌓이도록 설정 */
+            width: 200px; /* 내비게이션 바와 같은 너비 */
+        }
+
+        header {
+            background-color: #11235A;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        header img {
+            width: 100%; /* 이미지의 너비를 조정 */
+            max-width: 220px; /* 이미지의 최대 너비 */
+            height: auto; /* 비율에 맞게 높이 자동 조정 */
+        }
+        nav {
+            background-color: #11235A;
+            height: calc(100vh - 50px); /* 헤더 높이를 제외한 나머지 높이 */
+            padding: 10px 0; /* 상하 패딩 추가 */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* 오른쪽 그림자 추가 */
+        }
+        nav a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            display: flex; /* 플렉스 박스를 사용하여 아이콘과 텍스트를 수평으로 정렬 */
+            align-items: center; /* 수직 중앙 정렬 */
+        }
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .content {
+            flex: 1; /* 나머지 공간을 차지하도록 설정 */
+            margin-left: 20px; /* 내비게이션 바와의 거리 */
+            padding: 20px; /* 컨텐츠 패딩 추가 */
+        }
+        nav img {
+            margin-right: 17px; /* 아이콘과 텍스트 사이의 간격 */
+            width: 40px; /* 아이콘 크기 조정 */
+            height: auto; /* 비율 유지 */
+            filter: brightness(0) invert(1); /* 흰색으로 변경 */
+        }
+        /* 캠 박스 스타일 */
+        .camera-box {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative; /* 상대 위치 설정 */
+            flex: 7; /* 캠 박스의 비율 */
+        }
+        .attendance-check-box {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex: 1; /* 출석 확인 박스의 비율 */
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-nav">
+    <header>
+        <img src="{{ url_for('static', filename='images/fap_logo.png') }}" alt="USW 로고">
+    </header>
+
+    <nav>
+        <a href="{{ url_for('account') }}">
+            <img src="{{ url_for('static', filename='images/account.png') }}" alt="사용자 계정 아이콘">
+            계정
+        </a>
+        <a href="{{ url_for('dashboard') }}">
+            <img src="{{ url_for('static', filename='images/dashboard1.png') }}" alt="대시보드 아이콘">
+            대시보드
+        </a>
+        <a href="{{ url_for('calendar') }}">
+            <img src="{{ url_for('static', filename='images/calendar.png') }}" alt="캘린더 아이콘">
+            캘린더
+        </a>
+        <a href="{{ url_for('message') }}">
+            <img src="{{ url_for('static', filename='images/messenger.png') }}" alt="메신저 아이콘">
+            메신저
+        </a>
+    </nav>
+</div>
+
+<div class="content">
+    <h2>출결 조회</h2>
+
+    <div style="display: flex; justify-content: space-between;">
+        <!-- 캠 박스 -->
+        <div class="camera-box">
+            <h3>캠 영역</h3>
+            <img src="{{ url_for('video_feed', class_id=class_id , week=week) }}" width="100%" height="570px" alt="Camera Feed">
+            <button id="stop-button" onclick="startAttendance()" style="position: absolute; top: 10px; right: 10px;">출결 시작</button>
+            <button id="stop-button" onclick="endAttendance()" style="position: absolute; top: 10px; right: 10px;">출결 종료</button>
+        </div>
+
+        <!-- 출석 확인 박스 -->
+        <div class="attendance-check-box">
+            <h3>출석 확인</h3>
+            <div style="height: 570px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h4>출석 학생 리스트</h4>
+                <ul id="attendance-list" style="list-style-type: none; padding: 0; text-align: center;">
+                    <!-- 출석한 학생 이름을 동적으로 추가할 영역 -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Hidden inputs for class_id and week -->
+    <input type="hidden" id="class_id" value="{{ class_id }}">
+    <input type="hidden" id="week" value="{{ week }}">
+</div>
+        
+
+    <script>
+        // 출석 확인 함수 (서버에서 출석 정보를 받아와서 업데이트)
+        function updateAttendanceList() {
+            const classId = document.getElementById('class_id').value;
+            
+            fetch(`/get_attendance?class_id=${classId}`)  // 서버에서 출석 정보를 가져오는 엔드포인트
+                .then(response => response.json())
+                .then(data => {
+                    const attendanceList = document.getElementById('attendance-list');
+                    attendanceList.innerHTML = '';  // 기존 리스트 초기화
+                    data.forEach(student => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = student;  // 학생 이름 추가
+                        attendanceList.appendChild(listItem);
+                    });
+                });
+        }
+
+        // 주기적으로 출석 리스트 업데이트
+        setInterval(updateAttendanceList, 5000);  // 5초마다 업데이트
+    </script>
+</div>
+
+</body>
+</html>

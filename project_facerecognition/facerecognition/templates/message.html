@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메신저</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex; /* 플렉스 박스 레이아웃 사용 */
+        }
+        .header-nav {
+            display: flex; /* 헤더와 내비게이션 바를 같은 줄에 배치 */
+            flex-direction: column; /* 세로 방향으로 쌓이도록 설정 */
+            width: 200px; /* 내비게이션 바와 같은 너비 */
+        }
+        header {
+            background-color: #11235A;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        header img {
+            width: 100%; /* 이미지의 너비를 조정 */
+            max-width: 220px; /* 이미지의 최대 너비 */
+            height: auto; /* 비율에 맞게 높이 자동 조정 */
+        }
+        nav {
+            background-color: #11235A;
+            height: calc(100vh - 50px); /* 헤더 높이를 제외한 나머지 높이 */
+            padding: 10px 0; /* 상하 패딩 추가 */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* 오른쪽 그림자 추가 */
+        }
+        nav a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            display: flex; /* 플렉스 박스를 사용하여 아이콘과 텍스트를 수평으로 정렬 */
+            align-items: center; /* 수직 중앙 정렬 */
+        }
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .content {
+            flex: 1; /* 나머지 공간을 차지하도록 설정 */
+            margin-left: 20px; /* 내비게이션 바와의 거리 */
+            padding: 20px; /* 컨텐츠 패딩 추가 */
+        }
+        nav img {
+            margin-right: 17px; /* 아이콘과 텍스트 사이의 간격 */
+            width: 40px; /* 아이콘 크기 조정 */
+            height: auto; /* 비율 유지 */
+            filter: brightness(0) invert(1); /* 흰색으로 변경 */
+        }
+
+        /* 사이드바 스타일 */
+        .sidebar {
+            width: 250px;
+            background-color: #11235A;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+        }
+
+        .sidebar img {
+            width: 80px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            width: 100%;
+            padding: 15px 0;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar a:hover {
+            background-color: #0b1d49;
+        }
+
+        .sidebar img.icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        /* 메인 컨텐츠 */
+        .main-content {
+            display: flex;
+            flex: 1;
+            flex-direction: row;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+
+        /* 메시지 목록 */
+        .message-list {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+            border-right: 1px solid #ddd;
+            padding: 10px;
+            overflow-y: auto; /* 스크롤 추가 */
+            max-height: 90vh; /* 최대 높이 설정 */
+        }
+
+        .message-item {
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .message-item:hover {
+            background-color: #e0e0e0;
+        }
+
+        .message-item p {
+            margin: 5px 0;
+        }
+
+        .message-item .date {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .message-item .message-count {
+            background-color: #11235A;
+            color: white;
+            padding: 3px 7px;
+            border-radius: 50%;
+            font-size: 12px;
+        }
+
+        /* 메시지 내용 */
+        .message-content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-content h3 {
+            margin-top: 0;
+        }
+
+        .message-content p {
+            margin: 5px 0;
+        }
+
+        .message-content .sender {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .message-content .date-time {
+            font-size: 12px;
+            color: #888;
+        }
+        .reply-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: #11235A;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .reply-button:hover {
+            background-color: #0b1d49;
+        }
+
+        .hidden {
+            display: none;
+        }
+        .icon-buttons {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+            margin-right: 15px;
+        }
+
+        .icon-button {
+            padding: 8px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .popup-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            width: 600px;
+            height: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: red;
+        }
+
+        .popup-content h2 {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .popup-content label, .popup-content input, .popup-content select, .popup-content textarea {
+            width: 100%;
+            margin-bottom: 25px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .popup-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .popup-buttons button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .popup-buttons button[type="button"] {
+            background-color: #ccc;
+        }
+
+        .popup-buttons button[type="submit"] {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .popup-buttons button:hover {
+            opacity: 0.9;
+        }
+
+        /* 답변 목록 스타일 */
+        .replies {
+            margin-top: 20px;
+            padding-left: 20px;
+            background-color: #f9f9f9;
+            border-left: 2px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        /* 답변 박스의 넓이를 줄이기 */
+        .reply {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            max-width: 80%; /* 답변 박스의 최대 넓이를 80%로 설정 */
+            margin-left: 20px; /* 왼쪽 여백을 추가하여 답변 박스를 살짝 오른쪽으로 이동 */
+        }
+
+        /* 답변 내용 스타일 */
+        .reply p {
+            margin: 5px 0;
+        }
+
+        .reply strong {
+            color: #007bff;
+        }
+
+        /* 답변 목록의 제목 */
+        .replies h4 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+ <div class="header-nav">
+    <header>
+        <img src="{{ url_for('static', filename='images/fap_logo.png') }}" alt="FAP 로고">
+    </header>
+
+    <nav>
+        <a href="{{ url_for('account') }}">
+            <img src="{{ url_for('static', filename='images/account.png') }}" alt="사용자 계정 아이콘">
+            계정
+        </a>
+        <a href="{{ url_for('dashboard') }}">
+            <img src="{{ url_for('static', filename='images/dashboard1.png') }}" alt="대시보드 아이콘">
+            대시보드
+        </a>
+        <a href="{{ url_for('calendar') }}">
+            <img src="{{ url_for('static', filename='images/calendar.png') }}" alt="캘린더 아이콘">
+            캘린더
+        </a>
+        <a href="{{ url_for('message') }}">
+            <img src="{{ url_for('static', filename='images/messenger.png') }}" alt="메신저 아이콘">
+            메신저
+        </a>
+    </nav>
+</div>
+<!-- 메시지 메인 컨텐츠 -->
+<div class="main-content">
+    <!-- 메시지 목록 -->
+    <div class="message-list">
+        <div class="icon-buttons">
+            <button class="icon-button" onclick="openPopup()">&#9998;</button>
+        </div>
+        <button class="reply-button" onclick="openReplyPopup()">답변하기</button>
+
+        <h2>모든 과목</h2>
+        <!-- 메시지 항목은 동적으로 추가됩니다. -->
+        <div id="messageItems"></div>
+    </div>
+
+    <!-- 메시지 내용 -->
+    <div class="message-content" id="messageContent">
+        <h2>메시지 세부 정보</h2>
+        <div id="messageDetails"></div>
+    </div>
+
+
+    <!-- 메시지 작성 팝업 -->
+    <div id="messagePopup" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            <h2>메시지 작성</h2>
+            <form id="messageForm">
+                <label for="users">받는 사람</label>
+                <select name="receiver_id" id="users" required>
+                    <option value="">받는 사람 선택</option>
+                    {% for user in users %}
+                    <option value="{{ user[0] }}">{{ user[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="title">제목</label>
+                <input type="text" id="title" placeholder="주제 없음" required>
+
+                <textarea placeholder="내용을 입력하세요..." rows="5" required></textarea>
+
+                <div class="popup-buttons">
+                    <button type="button" onclick="closePopup()">취소</button>
+                    <button type="submit">전송</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+        <!-- 메시지 답변 팝업 -->
+        <div id="replyPopup" class="popup">
+            <div class="popup-content">
+                <span class="close" onclick="closeReplyPopup()">&times;</span>
+                <h2>답변하기</h2>
+                <form id="replyForm">
+                    <!-- receiver_id를 숨김 필드로 설정 -->
+                    <input type="hidden" id="replyReceiverId">
+                    <textarea placeholder="답변 내용을 입력하세요..." rows="5" required></textarea>
+
+                    <div class="popup-buttons">
+                        <button type="button" onclick="closeReplyPopup()">취소</button>
+                        <button type="submit">답변 보내기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    
+
+
+    <script>
+        // 전역 메시지 목록 변수를 피하기 위해 let으로 선언
+        let allMessages = []; // 모든 메시지를 초기화
+        let userList = [];
+        let selectedMessageId = null;  // 전역 변수로 선언
+
+
+        // 사용자 ID로 이름을 찾는 함수
+        function getUserName(userId) {
+            console.log("Searching for user ID:", userId);  // 전달된 userId를 출력
+            const user = userList.find(u => u.id === userId.toString());  // u.id는 사용자 ID
+            console.log("Found user:", user);  // 찾은 사용자 정보 출력
+            return user ? user.username : '알 수 없는 사용자';  // 사용자가 발견되면 username 반환
+        }
+
+        // 팝업 열기
+        function openPopup() {
+            document.getElementById("messagePopup").style.display = "block";
+        }
+        
+        // 팝업 닫기
+        function closePopup() {
+            document.getElementById("messagePopup").style.display = "none";
+        }
+        
+        // 답변 팝업 열기
+        function openReplyPopup(selectedReceiverId = null) {
+            if (selectedReceiverId !== null) {
+                document.getElementById('replyReceiverId').value = selectedReceiverId;  // 답변 대상 ID 설정
+            }
+            document.getElementById("replyPopup").style.display = "block";
+        }
+
+        // 답변 팝업 닫기
+        function closeReplyPopup() {
+            document.getElementById("replyPopup").style.display = "none";
+        }
+
+
+        // 바깥 클릭 시 팝업 닫기
+        window.onclick = function(event) {
+            const popup = document.getElementById("messagePopup");
+            if (event.target == popup) {
+
+                popup.style.display = "none";
+            }
+        }
+        
+        // 메시지를 클릭했을 때 답변 메시지도 함께 가져오는 함수
+        function showMessage(index) {
+            const selectedMessage = allMessages[index];
+            const senderName = getUserName(selectedMessage.sender_id);
+            const receiverName = getUserName(selectedMessage.receiver_id);
+
+            // 메시지 세부 정보 표시
+            document.getElementById('messageDetails').innerHTML = `
+                <h3>${selectedMessage.title}</h3>
+                <p><strong>메시지 ID:</strong> ${selectedMessage.message_id}</p>  <!-- message_id 표시 -->
+                <p><strong>보낸 사람:</strong> ${senderName}</p>
+                <p><strong>받는 사람:</strong> ${receiverName}</p>
+                <p>${selectedMessage.content}</p>
+                <button onclick="deleteMessage(${index})">삭제</button>
+            `;
+
+            // 선택된 메시지의 message_id 저장
+            selectedMessageId = selectedMessage.message_id;
+
+            // 답변할 때 receiver_id는 보낸 사람(sender_id)의 ID
+            document.getElementById('replyReceiverId').value = selectedMessage.sender_id;
+
+            // 답변 팝업을 열 때 자동으로 receiver 설정
+            document.querySelector('.reply-button').style.display = 'block';
+
+            // 선택된 메시지의 답변 메시지 가져오기
+            fetch(`/api/replies/${selectedMessageId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const replies = data.replies;
+                    let repliesHTML = '<h4>답변 목록</h4>';
+                    replies.forEach(reply => {
+                        repliesHTML += `
+                            <div class="reply">
+                                <p><strong>${getUserName(reply[1])}</strong> , ${getUserName(reply[4])}</p>
+                                <p>${reply[3]}</p>
+                            </div>
+                        `;
+                    });
+                    // 메시지 세부 정보에 답변 목록 추가
+                    document.getElementById('messageDetails').innerHTML += repliesHTML;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+
+
+
+        
+        // 메시지 삭제 함수
+        function deleteMessage(index) {
+            if (confirm("이 메시지를 삭제하시겠습니까?")) {
+                allMessages.splice(index, 1); // 선택한 메시지 삭제
+                localStorage.setItem('messages', JSON.stringify(allMessages)); // 로컬 스토리지에 저장
+                updateMessageList(); // 메시지 목록 업데이트
+                closePopup(); // 팝업 닫기
+            }else{
+                alert("메세지 삭제 실패");
+            }
+        }
+        
+        // 메시지 폼 제출
+        document.getElementById('messageForm').onsubmit = function(event) {
+            event.preventDefault();
+            
+            const userSelect = document.getElementById('users');
+            const titleInput = document.getElementById('title');
+            const contentTextarea = document.querySelector('textarea');
+            
+            const userId = userSelect.value;
+            const title = titleInput.value;
+            const content = contentTextarea.value;
+        
+            fetch('/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    title: title,
+                    content: content
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.status === 'success') {
+                    closePopup();
+                    // 새로운 메시지를 추가
+                    const newMessage = { sender: '{{ session.studentID }}', receiver: userId, title: title, content: content };
+                    allMessages.push(newMessage);
+                    // 로컬 스토리지에 저장
+                    localStorage.setItem('messages', JSON.stringify(allMessages));
+                    // 메시지 목록 업데이트
+                    updateMessageList();
+                    // 입력 필드 초기화
+                    titleInput.value = '';
+                    contentTextarea.value = '';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        };
+        //답변 폼 제출
+        document.getElementById('replyForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const receiverId = document.getElementById('replyReceiverId').value;
+            const content = this.querySelector('textarea').value;
+
+            fetch('/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    replyReceiverId: receiverId,
+                    content: content,
+                    reply_to_message_id: selectedMessageId  // 저장된 message_id를 reply_to_message_id로 전송
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    closeReplyPopup();
+                } else {
+                    alert('메시지 전송에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+
+        // 메시지 목록을 업데이트하는 함수
+        function updateMessageList() {
+            const messageList = document.getElementById('messageItems');
+            messageList.innerHTML = ''; // 기존 목록 비우기
+            allMessages.forEach((msg, index) => {
+                const messageItem = document.createElement('div');
+                messageItem.className = 'message-item';
+                messageItem.onclick = function() { showMessage(index); };
+                messageItem.innerHTML = `
+                    <p><strong>${getUserName(msg.sender_id)}</strong> , <strong>${getUserName(msg.receiver_id)}</strong></p>
+                    <p>${msg.title}</p>
+                `;
+                messageList.appendChild(messageItem);
+            });
+        }
+        
+        // 페이지가 로드될 때 메시지 목록 업데이트
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedMessages = localStorage.getItem('messages'); // 로컬 스토리지에서 'messages' 키로 가져오기
+            if(savedMessages) {
+                allMessages = JSON.parse(savedMessages);
+                updateMessageList(); // 문자열을 JSON으로 변환
+            }
+
+            fetch('/api/messages')  // 모든 메시지를 가져오는 API 호출
+            .then(response => response.json())
+            .then(data => {
+                const allMessages = data.messages.map(msg => ({
+                    message_id: msg[0],  // message_id
+                    sender_id: msg[1],    // sender_id
+                    title: msg[2],        // title
+                    content: msg[3],      // content
+                    receiver_id: msg[4]   // receiver_id
+                }));
+
+                userList = data.users.map(user => ({
+                    id: user[0],          // 사용자 ID
+                    username: user[1]      // 사용자 이름
+                }));
+
+                console.log("User List:", userList); // userList 확인
+
+                localStorage.setItem('messages', JSON.stringify(allMessages));
+                updateMessageList();
+            });
+
+                            
+        });
+      
+    </script>
+</div>
+        
+</body>
+</html>

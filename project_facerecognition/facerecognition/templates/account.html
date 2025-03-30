@@ -1,0 +1,180 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>계정</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex; /* 플렉스 박스 레이아웃 사용 */
+        }
+        .header-nav {
+            display: flex; /* 헤더와 내비게이션 바를 같은 줄에 배치 */
+            flex-direction: column; /* 세로 방향으로 쌓이도록 설정 */
+            width: 200px; /* 내비게이션 바와 같은 너비 */
+        }
+        header {
+            background-color: #11235A;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        header img {
+            width: 100%; /* 이미지의 너비를 조정 */
+            max-width: 220px; /* 이미지의 최대 너비 */
+            height: auto; /* 비율에 맞게 높이 자동 조정 */
+        }
+        nav {
+            background-color: #11235A;
+            height: calc(100vh - 50px); /* 헤더 높이를 제외한 나머지 높이 */
+            padding: 10px 0; /* 상하 패딩 추가 */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* 오른쪽 그림자 추가 */
+        }
+        nav a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            display: flex; /* 플렉스 박스를 사용하여 아이콘과 텍스트를 수평으로 정렬 */
+            align-items: center; /* 수직 중앙 정렬 */
+        }
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        nav img {
+            margin-right: 17px; /* 아이콘과 텍스트 사이의 간격 */
+            width: 40px; /* 아이콘 크기 조정 */
+            height: auto; /* 비율 유지 */
+            filter: brightness(0) invert(1); /* 흰색으로 변경 */
+        }
+        .content {
+            flex: 1;
+            padding: 40px;
+            background-color: #f9f9f9;
+        }
+        /* 사용자 정보 카드 */
+        .user-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .user-info h2 {
+            margin-top: 0;
+            color: #11235A;
+            font-size: 24px;
+        }
+        .user-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #555;
+        }
+
+        /* 수강 과목 리스트 카드 */
+        .class-list {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .class-list h3 {
+            margin-top: 0;
+            color: #11235A;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        .class-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .class-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .class-list li:last-child {
+            border-bottom: none;
+        }
+        .class-list .class-info {
+            font-size: 16px;
+            color: #333;
+        }
+        .attendance-button {
+            background-color: #11235A;
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .attendance-button:hover {
+            background-color: #0A2A7A;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-nav">
+    <header>
+        <img src="{{ url_for('static', filename='images/fap_logo.png') }}" alt="FAP 로고">
+    </header>
+
+    <nav>
+        <a href="{{ url_for('account') }}">
+            <img src="{{ url_for('static', filename='images/account.png') }}" alt="사용자 계정 아이콘">
+            계정
+        </a>
+        <a href="{{ url_for('dashboard') }}">
+            <img src="{{ url_for('static', filename='images/dashboard1.png') }}" alt="대시보드 아이콘">
+            대시보드
+        </a>
+        <a href="{{ url_for('calendar') }}">
+            <img src="{{ url_for('static', filename='images/calendar.png') }}" alt="캘린더 아이콘">
+            캘린더
+        </a>
+        <a href="{{ url_for('message') }}">
+            <img src="{{ url_for('static', filename='images/messenger.png') }}" alt="메신저 아이콘">
+            메신저
+        </a>
+    </nav>
+</div>
+
+<div class="content">
+    <!-- 사용자 정보 카드 -->
+    <div class="user-info">
+        <h2>{{ user_info.username }} 님</h2>
+        <p><strong>학번:</strong> {{ user_info.studentID }}</p>
+        <p><strong>소속 학과:</strong> {{ user_info.department }}</p>
+    </div>
+
+    <!-- 수강 과목 리스트 카드 -->
+    <div class="class-list">
+        <h3>수강 중인 과목</h3>
+        <ul>
+            {% for class in enrolled_classes %}
+            <li>
+                <div class="class-info">
+                    <span><strong>{{ class.class_name }}</strong> - {{ class.section }}분반</span>
+                </div>
+                <a href="{{ url_for('attendancecheck', class_id=class.class_id) }}" class="attendance-button">
+                    출결 조회
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>

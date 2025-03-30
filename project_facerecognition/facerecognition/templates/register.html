@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <title>회원가입</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 450px;
+            margin: 60px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="submit"] {
+            width: calc(100% - 20px); /* 전체 너비에서 여백을 뺀 값 */
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #11235A;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0A2A7A; /* 버튼 hover 시 색상 변경 */
+        }
+        .signup-link {
+            text-align: center;
+            margin-top: 10px;
+            color: #888; /* 연한 색상 추가 */
+        }
+        .signup-link a {
+            color: #0B2F9F; /* 링크 색상 */
+            text-decoration: none;
+        }
+        .signup-link a:hover {
+            text-decoration: underline; /* 링크에 마우스를 올렸을 때 밑줄 */
+        }
+        header {
+            background-color: #11235A;
+            text-align: center;
+            height: 85px; /* 헤더 높이를 로고 높이와 동일하게 설정 */
+            line-height: 80px; /* 로고가 수직 중앙 정렬되도록 조정 */
+            margin-bottom: 120px;
+        }
+        header img {
+            height: 80px; /* 로고 높이를 고정 */
+            width: auto; /* 비율 유지 */
+            vertical-align: middle; /* 로고가 헤더 중앙에 위치 */
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="{{ url_for('static', filename='images/fap_logo.png') }}" alt="USW 로고">
+</header>
+
+<div class="container">
+    <h1>회원가입</h1>
+
+    <!-- 플래시 메시지 표시 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <form action="#" method="POST">
+        <input type="text" name="username" placeholder="이름" required>
+        <input type="text" name="email" placeholder="이메일" required>
+        <input type="text" name="studentID" placeholder="아이디" required>
+        <input type="password" name="password" placeholder="비밀번호" required>
+        <input type="submit" value="회원가입">
+    </form>
+    <div class="signup-link">
+        <p>회원이신가요? <a href="{{url_for('login')}}">로그인</a></p>
+    </div>
+</div>
+
+</body>
+</html>
